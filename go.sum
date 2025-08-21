@@ -88,6 +88,8 @@ github.com/aws/aws-sdk-go-v2/service/sts v1.37.0 h1:MG9VFW43M4A8BYeAfaJJZWrroinx
 github.com/aws/aws-sdk-go-v2/service/sts v1.37.0/go.mod h1:JdeBDPgpJfuS6rU/hNglmOigKhyEZtBmbraLE4GK1J8=
 github.com/aws/smithy-go v1.22.5 h1:P9ATCXPMb2mPjYBgueqJNCA5S9UfktsW0tTxi+a7eqw=
 github.com/aws/smithy-go v1.22.5/go.mod h1:t1ufH5HMublsJYulve2RKmHDC15xu1f26kHCp/HgceI=
+github.com/bazelbuild/buildtools v0.0.0-20250715102656-62b9413b08bb h1:KCEfAAZ5hZH+CEMzShOZ4nCro20Ohf6whugQc2PLZiM=
+github.com/bazelbuild/buildtools v0.0.0-20250715102656-62b9413b08bb/go.mod h1:PLNUetjLa77TCCziPsz0EI8a6CUxgC+1jgmWv0H25tg=
 github.com/bazelbuild/remote-apis v0.0.0-20250728120203-e94a7ece2a1e h1:P0oJ1MpCJTu4lDRbb00aVaPTcDvaQ1uQFsVVBeqttIc=
 github.com/bazelbuild/remote-apis v0.0.0-20250728120203-e94a7ece2a1e/go.mod h1:/xo1pn3QkEL2JXrLeK30jvjVR/zXM9H8EqcWb/l5/A0=
 github.com/bazelbuild/rules_go v0.56.1 h1:YOyW1J8kdvJl1AzlWrR+qikC6EPiFVbT4l1gjTBfXT0=
@@ -95,12 +97,12 @@ github.com/bazelbuild/rules_go v0.56.1/go.mod h1:T90Gpyq4HDFlsrvtQa2CBdHNJ2P4rAu
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
 github.com/beorn7/perks v1.0.1/go.mod h1:G2ZrVWU2WbWT9wwq4/hrbKbnv/1ERSJQ0ibhJ6rlkpw=
-github.com/buildbarn/bb-browser v0.0.0-20250814052351-5d2ed98e0756 h1:0R1d39Q3EO7WJ93V2o89RxD78baarSMwxqz1lrO2Mig=
-github.com/buildbarn/bb-browser v0.0.0-20250814052351-5d2ed98e0756/go.mod h1:9Vm0ag5f67wbxox5I7lvasWdw760qZ6N/Eca5PvnYtc=
+github.com/buildbarn/bb-browser v0.0.0-20250820143915-823deb2f4b07 h1:Nxo5RQVv7OxsImvUiesXWFwG6SD2kP4hHozhJzMl7Nc=
+github.com/buildbarn/bb-browser v0.0.0-20250820143915-823deb2f4b07/go.mod h1:X5e1rBUgggvimE0+GWkR1baK+s8RkwOSwGDEJ2cA7q0=
 github.com/buildbarn/bb-remote-execution v0.0.0-20250820081613-efef252cdf4f h1:e0eYtwSJNSf6V7qpw4JX2sL5Rcxm4LMCWhXofEgH2dU=
 github.com/buildbarn/bb-remote-execution v0.0.0-20250820081613-efef252cdf4f/go.mod h1:6sdx0M5BZhU22C5ddaGXvlLJZZMlyuhbsVSMoFlVdMI=
-github.com/buildbarn/bb-storage v0.0.0-20250819193852-fd11d3e1b0b4 h1:OxpG/cb7Xxfz0HM0oM1320o45mz2suKt05KlEmzCjg8=
-github.com/buildbarn/bb-storage v0.0.0-20250819193852-fd11d3e1b0b4/go.mod h1:HetfamALiIPfoxhYb1f9v7Upxl3s01K8zwJ/3QZr5hw=
+github.com/buildbarn/bb-storage v0.0.0-20250827121715-fbb7c11d3502 h1:iaUIg7PzPapafhbqgcqMZFCk9VAvyfqmqP1+MLTTHAY=
+github.com/buildbarn/bb-storage v0.0.0-20250827121715-fbb7c11d3502/go.mod h1:HetfamALiIPfoxhYb1f9v7Upxl3s01K8zwJ/3QZr5hw=
 github.com/buildbarn/go-sha256tree v0.0.0-20250310211320-0f70f20e855b h1:IKUxixGBm9UxobU7c248z0BF0ojG19uoSLz8MFZM/KA=
 github.com/buildbarn/go-sha256tree v0.0.0-20250310211320-0f70f20e855b/go.mod h1:e7g3/yWApcg+PpDqd4eQEEV8pexQmfCgK3frP+1Wuvk=
 github.com/buildbarn/go-xdr v0.0.0-20240702182809-236788cf9e89 h1:Wtpgk4CIkoEJ7Qx3BwjaMp3TOVv834heqyCC9jMKStM=

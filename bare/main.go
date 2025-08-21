@@ -9,11 +9,13 @@ import (
 	"os/exec"
 	"os/signal"
 	"path"
+	"path/filepath"
+	"runtime"
 	"sync"
 	"syscall"
 	"time"
 
-	"github.com/bazelbuild/rules_go/go/tools/bazel"
+	"github.com/bazelbuild/rules_go/go/runfiles"
 )
 
 type buildbarnProcess struct {
@@ -22,12 +24,16 @@ type buildbarnProcess struct {
 }
 
 func bbStart(bbProcess *buildbarnProcess, workingDir string) *exec.Cmd {
-	binaryPath, found := bazel.FindBinary(path.Join("cmd", bbProcess.binary), bbProcess.binary)
-	if !found {
-		log.Printf("Couldn't find %s", bbProcess.binary)
+	binary := bbProcess.binary
+	if runtime.GOOS == "windows" {
+		binary += ".exe"
+	}
+	binaryPath, err := runfiles.Rlocation(binary)
+	if err != nil {
+		log.Printf("Couldn't find %s: %v", bbProcess.binary, err)
 		return nil
 	}
-	configPath, err := bazel.Runfile(bbProcess.config)
+	configPath, err := runfiles.Rlocation(bbProcess.config)
 	if err != nil {
 		log.Print(err)
 		return nil
@@ -37,11 +43,26 @@ func bbStart(bbProcess *buildbarnProcess, workingDir string) *exec.Cmd {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	cmd.Dir = workingDir
+	if runtime.GOOS == "windows" {
+		// PWD is used by the jsonnet configs, but is not set on Windows.
+		cmd.Env = append(os.Environ(), "PWD="+workingDir)
+	}
 	if err := cmd.Start(); err != nil {
 		log.Printf("Failed starting %s:\n%s", bbProcess.binary, err)
 		return nil
 	}
 	return cmd
+}
+
+func gracefulShutdown(process *os.Process) {
+	if runtime.GOOS == "windows" {
+		// On Windows, go does not support sending syscall.SIGINT. We instead
+		// rely on the fact that the CTRL_C_EVENT that is sent to signal
+		// graceful termination is normally delivered to the whole process
+		// group, so will already be sent to all of our subprocesses.
+	} else {
+		process.Signal(syscall.SIGTERM)
+	}
 }
 
 func bbWait(sigtermSignal, killSignal <-chan struct{}, bbProcess *buildbarnProcess, cmd *exec.Cmd) {
@@ -55,7 +76,7 @@ func bbWait(sigtermSignal, killSignal <-chan struct{}, bbProcess *buildbarnProce
 	case <-finished:
 		return
 	case <-sigtermSignal:
-		cmd.Process.Signal(syscall.SIGTERM)
+		gracefulShutdown(cmd.Process)
 	}
 	select {
 	case <-finished:
@@ -79,7 +100,7 @@ func main() {
 	} else if len(os.Args) == 2 {
 		workingDir = os.Args[1]
 		// Avoid accidental subfolders within Bazel's runfiles tree.
-		if !path.IsAbs(workingDir) {
+		if !filepath.IsAbs(workingDir) {
 			log.Fatalf("%s must be absolute", workingDir)
 		}
 		if _, err := os.Stat(workingDir); errors.Is(err, fs.ErrNotExist) {
@@ -101,12 +122,12 @@ func main() {
 	log.Println("\t- they should stop once bb_scheduler is ready")
 
 	bbs := []buildbarnProcess{
-		{config: "bare/config/storage.jsonnet", binary: "bb_storage"},
-		{config: "bare/config/frontend.jsonnet", binary: "bb_storage"},
-		{config: "bare/config/scheduler.jsonnet", binary: "bb_scheduler"},
-		{config: "bare/config/worker.jsonnet", binary: "bb_worker"},
-		{config: "bare/config/runner.jsonnet", binary: "bb_runner"},
-		{config: "bare/config/browser.jsonnet", binary: "bb_browser"},
+		{config: "_main/bare/config/storage.jsonnet", binary: "com_github_buildbarn_bb_storage+/cmd/bb_storage/bb_storage_/bb_storage"},
+		{config: "_main/bare/config/frontend.jsonnet", binary: "com_github_buildbarn_bb_storage+/cmd/bb_storage/bb_storage_/bb_storage"},
+		{config: "_main/bare/config/scheduler.jsonnet", binary: "com_github_buildbarn_bb_remote_execution+/cmd/bb_scheduler/bb_scheduler_/bb_scheduler"},
+		{config: "_main/bare/config/worker.jsonnet", binary: "com_github_buildbarn_bb_remote_execution+/cmd/bb_worker/bb_worker_/bb_worker"},
+		{config: "_main/bare/config/runner.jsonnet", binary: "com_github_buildbarn_bb_remote_execution+/cmd/bb_runner/bb_runner_/bb_runner"},
+		{config: "_main/bare/config/browser.jsonnet", binary: "com_github_buildbarn_bb_browser+/cmd/bb_browser/bb_browser_/bb_browser"},
 	}
 
 	sigtermContext, cancelWithSigterm := context.WithCancel(context.Background())
@@ -148,7 +169,7 @@ func main() {
 	// Kill processes if SIGTERM handling times out.
 	go func() {
 		<-sigtermContext.Done()
-		time.Sleep(10 * time.Second)
+		time.Sleep(60 * time.Second)
 		log.Print("SIGTERM handling was slow, killing Buildbarn processes")
 		cancelWithKill()
 	}()
