@@ -37,7 +37,7 @@ else
 fi
 
 bazel run --script_path="$script_name" -- //bare "$data"
-echo 'N' | $script_exec 2>"${bare_output}" &
+echo 'Y' | $script_exec 2>"${bare_output}" &
 buildbarn_pid=$!
 
 cleanup() {
@@ -68,6 +68,10 @@ grep -E '^INFO: [0-9]+ processes: .*[0-9]+ remote[.,]' \
 
 # --- Check that we get cache hit even after rebooting the server ---
 kill -s $kill_sig "$buildbarn_pid"
+sleep 60
+cat ${bare_output}
+ps -a
+tasklist
 wait "$buildbarn_pid" || true
 $script_exec 2>"${bare_output}" &
 buildbarn_pid=$!
