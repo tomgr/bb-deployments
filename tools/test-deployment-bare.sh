@@ -27,7 +27,6 @@ if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" ]]; t
     kill_sig='SIGINT'
     remote_exec_config='--config=remote-local --config=remote-exec-windows'
     export OS="Windows"
-    export PWD=$(pwd -W)
 else
     script_name="run_bare.sh"
     script_exec="./$script_name"
@@ -38,7 +37,7 @@ else
 fi
 
 bazel run --script_path="$script_name" -- //bare "$data"
-$script_exec </dev/null 2>"${bare_output}" &
+echo 'N' | $script_exec 2>"${bare_output}" &
 buildbarn_pid=$!
 
 cleanup() {
