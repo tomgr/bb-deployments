@@ -67,16 +67,16 @@ grep -E '^INFO: [0-9]+ processes: .*[0-9]+ remote[.,]' \
     | grep -v 'remote cache hit'
 
 # --- Check that we get cache hit even after rebooting the server ---
-/bin/kill -s $kill_sig "$buildbarn_pid"
+/usr/bin/kill -s $kill_sig "$buildbarn_pid"
 sleep 30
 cat ${bare_output}
-ps -a
-tasklist
-if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" ]]; then
-    powershell -Command "Get-WmiObject -Class Win32_Processor | Measure-Object -Property LoadPercentage -Average | Select-Object -ExpandProperty Average"
-else
-    top -bn1 | grep "Cpu(s)" | awk '{print $2}' | sed 's/%us,//'
-fi
+# ps -a
+# tasklist
+# if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" ]]; then
+#     powershell -Command "Get-WmiObject -Class Win32_Processor | Measure-Object -Property LoadPercentage -Average | Select-Object -ExpandProperty Average"
+# else
+#     top -bn1 | grep "Cpu(s)" | awk '{print $2}' | sed 's/%us,//'
+# fi
 wait "$buildbarn_pid" || true
 $script_exec 2>"${bare_output}" &
 buildbarn_pid=$!

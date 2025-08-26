@@ -5,13 +5,28 @@
          "runs-on": "${{ matrix.host.os }}",
          "steps": [
             {
-               "name": "Version",
-               "run": "uname -a",
-               "shell": "C:\\shells\\msys2bash.cmd {0}"
-            },
-            {
                "name": "Check out source code",
                "uses": "actions/checkout@v1"
+            },
+            {
+               "name": "version check",
+               "run": "bash --version",
+               "shell": "bash",
+            },
+            # {
+            #    "name": "version check",
+            #    "run": "kill --help",
+            #    "shell": "bash",
+            # },
+            {
+               "name": "version check",
+               "run": "/bin/kill --help",
+               "shell": "bash",
+            },
+            {
+               "name": "version check",
+               "run": "/bin/kill --version",
+               "shell": "bash",
             },
             {
                "if": "matrix.host.platform_name == 'linux_amd64'",
@@ -31,7 +46,7 @@
             {
                "name": "Installing Bazel",
                "run": "v=$(cat .bazelversion) && curl -L https://github.com/bazelbuild/bazel/releases/download/${v}/bazel-${v}-${{matrix.host.bazel_os}}-x86_64 > ~/bazel && chmod +x ~/bazel && echo ~ >> ${GITHUB_PATH}",
-               "shell": "C:\\shells\\msys2bash.cmd {0}"
+               "shell": "bash"
             },
             {
                "if": "matrix.host.platform_name == 'windows_amd64'",
@@ -146,7 +161,7 @@
             {
                "name": "Test bare deployment",
                "run": "tools/test-deployment-bare.sh",
-               "shell": "C:\\shells\\msys2bash.cmd {0}"
+               "shell": "bash"
             },
             {
                "if": "matrix.host.platform_name == 'linux_amd64'",
