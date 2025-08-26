@@ -9,23 +9,13 @@
                "uses": "actions/checkout@v1"
             },
             {
-               "name": "version check",
-               "run": "bash --version",
-               "shell": "bash",
-            },
-            # {
-            #    "name": "version check",
-            #    "run": "kill --help",
-            #    "shell": "bash",
-            # },
-            {
-               "name": "version check",
-               "run": "/bin/kill --help",
-               "shell": "bash",
+               "if": "matrix.host.platform_name == 'windows_amd64'",
+               "name": "Install WinFSP",
+               "run": "choco install windows-kill winfsp"
             },
             {
                "name": "version check",
-               "run": "/bin/kill --version",
+               "run": "tools/test-interrupt.sh",
                "shell": "bash",
             },
             {
@@ -37,11 +27,6 @@
                "if": "matrix.host.platform_name == 'linux_amd64'",
                "name": "Install k3d",
                "run": "curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash"
-            },
-            {
-               "if": "matrix.host.platform_name == 'windows_amd64'",
-               "name": "Install WinFSP",
-               "run": "choco install winfsp"
             },
             {
                "name": "Installing Bazel",
@@ -186,7 +171,7 @@
                      "bazel_os": "windows",
                      "cross_compile": false,
                      "lint": false,
-                     "os": "windows-2025",
+                     "os": "windows-2022",
                      "platform_name": "windows_amd64",
                      "upload": false
                   }
