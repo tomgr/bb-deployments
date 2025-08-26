@@ -67,7 +67,7 @@ grep -E '^INFO: [0-9]+ processes: .*[0-9]+ remote[.,]' \
     | grep -v 'remote cache hit'
 
 # --- Check that we get cache hit even after rebooting the server ---
-kill -s $kill_sig "$buildbarn_pid"
+/bin/kill -s $kill_sig "$buildbarn_pid"
 sleep 60
 cat ${bare_output}
 ps -a
