@@ -44,9 +44,9 @@ cleanup() {
     EXIT_STATUS=$?
     kill "$buildbarn_pid" || true
     wait "$buildbarn_pid" || true
-    if [ "$EXIT_STATUS" -ne "0" ]; then
-        cat "$bare_output" || true
-    fi
+    # if [ "$EXIT_STATUS" -ne "0" ]; then
+        # cat "$bare_output" || true
+    # fi
     bazel --output_base="$abseil_output_base" shutdown
     rm -rf "$data"
     rm -rf "$abseil_output_base"
@@ -68,10 +68,15 @@ grep -E '^INFO: [0-9]+ processes: .*[0-9]+ remote[.,]' \
 
 # --- Check that we get cache hit even after rebooting the server ---
 /bin/kill -s $kill_sig "$buildbarn_pid"
-sleep 60
+sleep 30
 cat ${bare_output}
 ps -a
 tasklist
+if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" ]]; then
+    powershell -Command "Get-WmiObject -Class Win32_Processor | Measure-Object -Property LoadPercentage -Average | Select-Object -ExpandProperty Average"
+else
+    top -bn1 | grep "Cpu(s)" | awk '{print $2}' | sed 's/%us,//'
+fi
 wait "$buildbarn_pid" || true
 $script_exec 2>"${bare_output}" &
 buildbarn_pid=$!
