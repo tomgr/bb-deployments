@@ -163,18 +163,10 @@
             "matrix": {
                "host": [
                   {
-                     "bazel_os": "linux",
-                     "cross_compile": true,
-                     "lint": true,
-                     "os": "ubuntu-latest",
-                     "platform_name": "linux_amd64",
-                     "upload": true
-                  },
-                  {
                      "bazel_os": "windows",
                      "cross_compile": false,
                      "lint": false,
-                     "os": "windows-latest",
+                     "os": "windows-2025",
                      "platform_name": "windows_amd64",
                      "upload": false
                   }
