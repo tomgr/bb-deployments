@@ -5,6 +5,11 @@
          "runs-on": "${{ matrix.host.os }}",
          "steps": [
             {
+               "name": "Version",
+               "run": "uname -a",
+               "shell": "bash"
+            },
+            {
                "name": "Check out source code",
                "uses": "actions/checkout@v1"
             },
