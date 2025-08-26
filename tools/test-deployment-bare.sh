@@ -37,7 +37,7 @@ else
 fi
 
 bazel run --script_path="$script_name" -- //bare "$data"
-echo 'Y' | $script_exec 2>"${bare_output}" &
+$script_exec </dev/null 2>"${bare_output}" &
 buildbarn_pid=$!
 
 cleanup() {
