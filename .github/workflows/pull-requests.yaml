@@ -7,7 +7,7 @@
             {
                "name": "Version",
                "run": "uname -a",
-               "shell": "bash"
+               "shell": "msys2bash.cmd"
             },
             {
                "name": "Check out source code",
@@ -146,7 +146,7 @@
             {
                "name": "Test bare deployment",
                "run": "tools/test-deployment-bare.sh",
-               "shell": "bash"
+               "shell": "msys2bash.cmd"
             },
             {
                "if": "matrix.host.platform_name == 'linux_amd64'",
