@@ -94,7 +94,7 @@ def main() -> int:
         # Shutdown bazel
         try:
             print("Shutting down bazel")
-            run_command(["bazel", "shutdown"], check=True, cwd=root)
+            run_command(["bazel",f"--output_base={abseil_output_base}", "shutdown"], check=True, cwd=root)
         except Exception as e:
             log_error(f"Failed to terminate Bazel process: {e}")
 
@@ -121,6 +121,8 @@ def main() -> int:
                 stderr=subprocess.STDOUT,
                 cwd=working_directory
             )
+              # Give some time for the server to start
+            time.sleep(5)
         
         print(f"Started buildbarn with PID: {buildbarn_pid.pid}")
         
@@ -174,6 +176,8 @@ def main() -> int:
                 stderr=subprocess.STDOUT,
                 cwd=working_directory
             )
+            # Give some time for the server to start
+            time.sleep(5)
         
         # Clean bazel cache again
         run_command([
