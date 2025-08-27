@@ -14,6 +14,11 @@
                "run": "choco install windows-kill winfsp"
             },
             {
+               "if": "matrix.host.platform_name == 'windows_amd64'",
+               "name": "Install WinFSP",
+               "run": "& bash ./tools/test-interrupt.sh"
+            },
+            {
                "name": "version check",
                "run": "tools/test-interrupt.sh",
                "shell": "bash",
