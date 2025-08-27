@@ -16,24 +16,11 @@ def log_error(message: str) -> None:
     """Log error message to stderr"""
     print(message, file=sys.stderr)
 
-def cleanup_directory(path: Path) -> None:
-    """Safely remove a directory if it exists"""
-    if path.exists():
-        try:
-            shutil.rmtree(path)
-        except Exception as e:
-            log_error(f"Warning: Failed to remove {path}: {e}")
-
 def run_command(cmd: Union[str, List[str]], check: bool = True, capture_output: bool = False, **kwargs) -> subprocess.CompletedProcess:
     """Run a command with error handling"""
     print(f"Running: {' '.join(cmd) if isinstance(cmd, list) else cmd}")
     try:
-        if capture_output:
-            result = subprocess.run(cmd, capture_output=True, text=True, check=check, **kwargs)
-            return result
-        else:
-            result = subprocess.run(cmd, check=check, **kwargs)
-            return result
+        return subprocess.run(cmd, capture_output=capture_output, check=check, **kwargs)
     except subprocess.CalledProcessError as e:
         log_error(f"Command failed: {e}")
         raise
@@ -62,7 +49,6 @@ def main() -> int:
     script_dir = Path(__file__).parent
     root: Path = script_dir.parent
 
-    # Create working directory
     working_directory: Path = root / "tmp-test-bare"
     if working_directory.exists():
         shutil.rmtree(working_directory)
@@ -77,8 +63,8 @@ def main() -> int:
     system: str = platform.system()
     remote_exec_config: List[str] = ['--config=remote-local']
     if system == "Windows":
-        script_name: Path = working_directory/"run_bare.cmd"
-        script_exec: List[str] = ["cmd.exe", "/c",str( script_name)]
+        script_name = working_directory/"run_bare.cmd"
+        script_exec = ["cmd.exe", "/c",str( script_name)]
         remote_exec_config.append('--config=remote-exec-windows')
         os.environ["OS"] = "Windows"
     else:
@@ -91,7 +77,6 @@ def main() -> int:
     def cleanup() -> None:
         """Cleanup function to be called on exit"""
         print("Cleaning up...")
-        
         
         # Terminate buildbarn process if running
         if buildbarn_pid and buildbarn_pid.poll() is None:
@@ -108,12 +93,15 @@ def main() -> int:
 
         # Shutdown bazel
         try:
-            run_command(["bazel", f"--output_base={abseil_output_base}", "shutdown"], 
-                       check=False, cwd=root)
-        except:
-            pass
+            print("Shutting down bazel")
+            run_command(["bazel", "shutdown"], check=True, cwd=root)
+        except Exception as e:
+            log_error(f"Failed to terminate Bazel process: {e}")
 
-        shutil.rmtree(working_directory)
+        try:
+            shutil.rmtree(working_directory)
+        except Exception as e:
+            log_error(f"Failed to cleanup directory: {e}")
 
     try:
         # Generate the bare deployment script
@@ -128,7 +116,8 @@ def main() -> int:
             buildbarn_pid = subprocess.Popen(
                 script_exec,
                 stdin=subprocess.DEVNULL,
-                stderr=output_file,
+                stdout=output_file,
+                stderr=subprocess.STDOUT,
                 cwd=working_directory
             )
         
@@ -174,33 +163,16 @@ def main() -> int:
             buildbarn_pid.send_signal(signal.SIGTERM)
             buildbarn_pid.wait()
         
-        # Show output from the first run
-        # if os.path.exists(bare_output):
-        #     print("Output from first run:")
-        #     with open(bare_output, 'r') as f:
-        #         print(f.read())
-        
-        # # Show running processes (equivalent to tasklist)
-        # if system == "Windows":
-        #     try:
-        #         result = run_command(["tasklist"], capture_output=True)
-        #         print("Running processes:")
-        #         print(result.stdout)
-        #     except:
-        #         pass
-        
         # Restart the server
         print("Restarting buildbarn server...")
         with open(bare_output, 'w') as output_file:
             buildbarn_pid = subprocess.Popen(
                 script_exec,
                 stdin=subprocess.DEVNULL,
-                stderr=output_file,
+                stdout=output_file,
+                stderr=subprocess.STDOUT,
                 cwd=working_directory
             )
-        
-        # Wait for server to start
-        time.sleep(5)
         
         # Clean bazel cache again
         run_command([
