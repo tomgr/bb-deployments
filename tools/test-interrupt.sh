@@ -12,7 +12,7 @@ echo Task completed normally
 EOF
 
 echo "Starting cmd.exe with subcommand..."
-cmd.exe //c $test_script </dev/null >test-subcommand-output.txt 2>&1 &
+cmd.exe //c $test_script </dev/null &
 CMD_PID=$!
 
 echo "Started cmd.exe with PID: $CMD_PID"
@@ -42,10 +42,4 @@ if kill -0 $CMD_PID 2>/dev/null; then
     exit 1
 else
     echo "SUCCESS: Process terminated successfully"
-fi
-
-# Check the output
-if [[ -f test-subcommand-output.txt ]]; then
-    echo "Command output:"
-    cat test-subcommand-output.txt
 fi

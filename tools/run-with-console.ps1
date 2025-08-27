@@ -11,14 +11,27 @@ public class ConsoleExt {
     [DllImport("kernel32.dll")]
     public static extern bool AllocConsole();
     [DllImport("kernel32.dll")]
+    public static extern bool FreeConsole();
+    [DllImport("kernel32.dll")]
     public static extern IntPtr GetConsoleWindow();
+    [DllImport("kernel32.dll")]
+    public static extern uint GetLastError();
 }
 "@
 
 # Allocate console if not already present
 if ([ConsoleExt]::GetConsoleWindow() -eq [IntPtr]::Zero) {
     Write-Host "Allocating console..."
-    [ConsoleExt]::AllocConsole() | Out-Null
+    
+    [ConsoleExt]::FreeConsole() | Out-Null
+
+    $success = [ConsoleExt]::AllocConsole()
+    if (-not $success) {
+        $errorCode = [ConsoleExt]::GetLastError()
+        Write-Error "Failed to allocate console. Error code: $errorCode"
+    } else {
+        Write-Host "Console allocated successfully."
+    }
 } else {
     Write-Host "Console already allocated."
 }
