@@ -7,7 +7,7 @@ echo "Testing SIGINT with simple subcommand"
 test_script="test-long-running-task.bat"
 cat > "$test_script" << 'EOF'
 echo Starting long running task...
-ping -n 60 -w 1000 localhost > nul
+ping -n 60 -w 1000 localhost
 echo Task completed normally
 EOF
 
@@ -28,16 +28,16 @@ fi
 echo "Sending SIGINT to cmd.exe process..."
 
 CMD_WINDOWS_PID=$(cat /proc/$CMD_PID/winpid)
-python3 ./tools/test-interrupt-pid.py $CMD_WINDOWS_PID
-# kill -SIGINT $CMD_PID
+# python3 ./tools/test-interrupt-pid.py $CMD_WINDOWS_PID
+kill -SIGINT $CMD_PID
 
 exit_code=0
 if ! wait $CMD_PID; then
     exit_code=$?
 fi
 
-echo "Error log from test-interrupt-pid.py"
-cat err.log
+# echo "Error log from test-interrupt-pid.py"
+# cat err.log
 
 echo "cmd.exe exited with code: $exit_code"
 
