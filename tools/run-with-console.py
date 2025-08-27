@@ -2,7 +2,7 @@ import subprocess
 import sys
 
 result = subprocess.run(
-    [sys.executable, "tools/test-interrupt.py"],
+    ["C:\\Program Files\\Git\\usr\\bin\\bash.exe", "tools/test-interrupt.sh"],
     creationflags=subprocess.CREATE_NEW_CONSOLE|subprocess.CREATE_NEW_PROCESS_GROUP|subprocess.CREATE_NO_WINDOW,
     stdout=subprocess.PIPE,
     stderr=subprocess.PIPE,

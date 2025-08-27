@@ -28,8 +28,8 @@ fi
 echo "Sending SIGINT to cmd.exe process..."
 
 CMD_WINDOWS_PID=$(cat /proc/$CMD_PID/winpid)
-powershell.exe ./tools/test-interrupt-pid.ps1 $CMD_WINDOWS_PID
-# kill -SIGINT $CMD_PID
+# powershell.exe ./tools/test-interrupt-pid.py $CMD_WINDOWS_PID
+kill -SIGINT $CMD_PID
 
 exit_code=0
 if ! wait $CMD_PID; then
