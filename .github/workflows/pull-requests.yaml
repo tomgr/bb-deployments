@@ -10,6 +10,11 @@
             },
             {
                "if": "matrix.host.platform_name == 'windows_amd64'",
+               "name": "python",
+               "run": "python3 ./tools/test-interrupt.py"
+            },
+            {
+               "if": "matrix.host.platform_name == 'windows_amd64'",
                "name": "Install WinFSP",
                "run": "choco install windows-kill winfsp"
             },
