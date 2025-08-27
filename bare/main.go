@@ -178,7 +178,7 @@ func main() {
 	// Kill processes if SIGTERM handling times out.
 	go func() {
 		<-sigtermContext.Done()
-		time.Sleep(180 * time.Second)
+		time.Sleep(60 * time.Second)
 		log.Print("SIGTERM handling was slow, killing Buildbarn processes")
 		cancelWithKill()
 	}()

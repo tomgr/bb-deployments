@@ -36,7 +36,7 @@ def terminate_process_windows(proc: subprocess.Popen) -> None:
         pass
 
     try:
-        exit_code = proc.wait(timeout=60)
+        exit_code = proc.wait(timeout=120)
         print(f"Process exited with code: {exit_code}")
     except subprocess.TimeoutExpired:
         print("ERROR: Process did not terminate after Ctrl+C")
@@ -109,6 +109,7 @@ def main() -> int:
             "bazel", "run", f"--script_path={script_name}", "--", 
             "//bare", str(data_dir)
         ], cwd=root)
+        run_command(["bazel", "shutdown"], cwd=root)
         
         # Start the buildbarn server
         print("Starting buildbarn server...")
