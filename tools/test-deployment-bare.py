@@ -8,17 +8,18 @@ import shutil
 import platform
 import tempfile
 import ctypes
+import stat
 import signal
 from pathlib import Path
 from typing import Optional, List, Union
 
 def log_error(message: str) -> None:
     """Log error message to stderr"""
-    print(message, file=sys.stderr)
+    print(message, file=sys.stderr,flush=True)
 
 def run_command(cmd: Union[str, List[str]], check: bool = True, capture_output: bool = False, **kwargs) -> subprocess.CompletedProcess:
     """Run a command with error handling"""
-    print(f"Running: {' '.join(cmd) if isinstance(cmd, list) else cmd}")
+    print(f"Running: {' '.join(cmd) if isinstance(cmd, list) else cmd}",flush=True)
     try:
         return subprocess.run(cmd, capture_output=capture_output, check=check, **kwargs)
     except subprocess.CalledProcessError as e:
@@ -27,7 +28,7 @@ def run_command(cmd: Union[str, List[str]], check: bool = True, capture_output: 
 
 def terminate_process_windows(proc: subprocess.Popen) -> None:
     """Terminate process using the same mechanism as test-interrupt.py"""
-    print("Sending Ctrl+C to process...")
+    print("Sending Ctrl+C to process...",flush=True)
     
     try:
         ctypes.windll.kernel32.GenerateConsoleCtrlEvent(0, 0)
@@ -37,21 +38,26 @@ def terminate_process_windows(proc: subprocess.Popen) -> None:
 
     try:
         exit_code = proc.wait(timeout=120)
-        print(f"Process exited with code: {exit_code}")
+        print(f"Process exited with code: {exit_code}",flush=True)
     except subprocess.TimeoutExpired:
-        print("ERROR: Process did not terminate after Ctrl+C")
+        print("ERROR: Process did not terminate after Ctrl+C",flush=True)
         proc.kill()
         raise RuntimeError("Process termination failed")
 
+def remove_readonly(func, path, _):
+   "Clear the readonly bit and reattempt the removal"
+   os.chmod(path, stat.S_IWRITE)
+   func(path)
+
 def main() -> int:
-    print("Starting bare deployment test")
+    print("Starting bare deployment test",flush=True)
     
     script_dir = Path(__file__).parent
     root: Path = script_dir.parent
 
     working_directory: Path = root / "tmp-test-bare"
     if working_directory.exists():
-        shutil.rmtree(working_directory)
+        shutil.rmtree(working_directory, onexc=remove_readonly)
     working_directory.mkdir()
     
     abseil_output_base = working_directory / "abseil_output_base"
@@ -76,7 +82,7 @@ def main() -> int:
     
     def cleanup() -> None:
         """Cleanup function to be called on exit"""
-        print("Cleaning up...")
+        print("Cleaning up...",flush=True)
         
         # Terminate buildbarn process if running
         if buildbarn_pid and buildbarn_pid.poll() is None:
@@ -93,13 +99,12 @@ def main() -> int:
 
         # Shutdown bazel
         try:
-            print("Shutting down bazel")
             run_command(["bazel",f"--output_base={abseil_output_base}", "shutdown"], check=True, cwd=root)
         except Exception as e:
             log_error(f"Failed to terminate Bazel process: {e}")
 
         try:
-            shutil.rmtree(working_directory)
+            shutil.rmtree(working_directory, onexc=remove_readonly)
         except Exception as e:
             log_error(f"Failed to cleanup directory: {e}")
 
@@ -112,7 +117,7 @@ def main() -> int:
         run_command(["bazel", "shutdown"], cwd=root)
         
         # Start the buildbarn server
-        print("Starting buildbarn server...")
+        print("Starting buildbarn server...",flush=True)
         with open(bare_output, 'w') as output_file:
             buildbarn_pid = subprocess.Popen(
                 script_exec,
@@ -124,10 +129,10 @@ def main() -> int:
               # Give some time for the server to start
             time.sleep(5)
         
-        print(f"Started buildbarn with PID: {buildbarn_pid.pid}")
+        print(f"Started buildbarn with PID: {buildbarn_pid.pid}",flush=True)
         
         # --- Run remote execution ---
-        print("Running first remote execution test...")
+        print("Running first remote execution test...",flush=True)
         
         run_command([
             "bazel", f"--output_base={abseil_output_base}", "--nohome_rc", "clean"
@@ -149,7 +154,7 @@ def main() -> int:
             for line in log_content.split('\n'):
                 if line.startswith('INFO:') and 'processes:' in line and 'remote' in line:
                     if 'remote cache hit' not in line:
-                        print(f"Found remote execution: {line}")
+                        print(f"Found remote execution: {line}",flush=True)
                         remote_found = True
                         break
             
@@ -157,7 +162,7 @@ def main() -> int:
                 raise RuntimeError("Expected remote executions but found none")
         
         # --- Check that we get cache hit even after rebooting the server ---
-        print("Restarting server to test cache persistence...")
+        print("Restarting server to test cache persistence...",flush=True)
         
         # Terminate the buildbarn process using the same mechanism as test-interrupt.py
         if system == "Windows":
@@ -167,7 +172,7 @@ def main() -> int:
             buildbarn_pid.wait()
         
         # Restart the server
-        print("Restarting buildbarn server...")
+        print("Restarting buildbarn server...",flush=True)
         with open(bare_output, 'w') as output_file:
             buildbarn_pid = subprocess.Popen(
                 script_exec,
@@ -185,7 +190,7 @@ def main() -> int:
         ], cwd=root)
         
         # Run test again - should get cache hits
-        print("Running second test (expecting cache hits)...")
+        print("Running second test (expecting cache hits)...",flush=True)
         run_command(cmd, cwd=root)
         
         # Check for remote cache hits but no remote executions
@@ -197,14 +202,14 @@ def main() -> int:
             for line in log_content.split('\n'):
                 if (line.startswith('INFO:') and 'processes:' in line and 
                     'remote cache hit' in line and 'remote,' not in line and 'remote.' not in line):
-                    print(f"Found cache hit: {line}")
+                    print(f"Found cache hit: {line}",flush=True)
                     cache_hit_found = True
                     break
             
             if not cache_hit_found:
                 raise RuntimeError("Expected remote cache hits but found none")
         
-        print("SUCCESS: Bare deployment test completed successfully")
+        print("SUCCESS: Bare deployment test completed successfully",flush=True)
         return 0
         
     except Exception as e:
@@ -212,9 +217,9 @@ def main() -> int:
         
         # Show output on failure
         if os.path.exists(working_directory / bare_output):
-            print("Server output:")
+            print("Server output:",flush=True)
             with open(working_directory / bare_output, 'r') as f:
-                print(f.read())
+                print(f.read(),flush=True)
         
         return 1
         

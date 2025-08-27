@@ -184,7 +184,7 @@
                      "bazel_os": "windows",
                      "cross_compile": false,
                      "lint": false,
-                     "os": "windows-2025",
+                     "os": "windows-2022",
                      "platform_name": "windows_amd64",
                      "upload": false
                   }
