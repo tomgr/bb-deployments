@@ -12,7 +12,7 @@ echo Task completed normally
 EOF
 
 echo "Starting cmd.exe with subcommand..."
-cmd.exe //c $test_script </dev/null &
+cmd.exe //c $test_script &
 CMD_PID=$!
 
 echo "Started cmd.exe with PID: $CMD_PID"
@@ -29,6 +29,7 @@ echo "Sending SIGINT to cmd.exe process..."
 
 CMD_WINDOWS_PID=$(cat /proc/$CMD_PID/winpid)
 python3 ./tools/test-interrupt-pid.py $CMD_WINDOWS_PID
+# kill -SIGINT $CMD_PID
 
 exit_code=0
 if ! wait $CMD_PID; then
