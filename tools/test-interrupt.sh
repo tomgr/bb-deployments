@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# set -eux -o pipefail -E
+set -eux -o pipefail -E
 
 echo "Testing SIGINT with simple subcommand"
 
@@ -27,11 +27,7 @@ fi
 
 echo "Sending SIGINT to cmd.exe process..."
 
-echo "Converting POSIX PID $CMD_PID to Windows PID..."
-WIN_PID=$(cat /proc/$CMD_PID/winpid)
-echo "Windows PID: $WIN_PID"
-
-windows-kill -SIGINT $WIN_PID
+kill -SIGINT $CMD_PID
 
 exit_code=0
 if ! wait $CMD_PID; then

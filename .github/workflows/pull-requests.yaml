@@ -16,13 +16,13 @@
             {
                "if": "matrix.host.platform_name == 'windows_amd64'",
                "name": "Install WinFSP",
-               "run": "& bash ./tools/test-interrupt.sh"
+               "run": "./tools/run-with-console.ps1 bash ./tools/test-interrupt.sh"
             },
-            {
-               "name": "version check",
-               "run": "tools/test-interrupt.sh",
-               "shell": "bash",
-            },
+            # {
+            #    "name": "version check",
+            #    "run": "tools/test-interrupt.sh",
+            #    "shell": "bash",
+            # },
             {
                "if": "matrix.host.platform_name == 'linux_amd64'",
                "name": "Installing grpcurl",
