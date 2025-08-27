@@ -27,12 +27,16 @@ fi
 
 echo "Sending SIGINT to cmd.exe process..."
 
-kill -SIGINT $CMD_PID
+CMD_WINDOWS_PID=$(cat /proc/$CMD_PID/winpid)
+python3 ./tools/test-interrupt-pid.py $CMD_WINDOWS_PID
 
 exit_code=0
 if ! wait $CMD_PID; then
     exit_code=$?
 fi
+
+echo "Error log from test-interrupt-pid.py"
+cat err.log
 
 echo "cmd.exe exited with code: $exit_code"
 

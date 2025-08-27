@@ -9,19 +9,18 @@
                "uses": "actions/checkout@v1"
             },
             {
-               "if": "matrix.host.platform_name == 'windows_amd64'",
                "name": "python",
                "run": "python3 ./tools/test-interrupt.py"
+            },
+            {
+               "name": "Run interrupt",
+               "run": "tools/test-interrupt.sh",
+               "shell": "bash",
             },
             {
                "if": "matrix.host.platform_name == 'windows_amd64'",
                "name": "Install WinFSP",
                "run": "choco install windows-kill winfsp"
-            },
-            {
-               "if": "matrix.host.platform_name == 'windows_amd64'",
-               "name": "Install WinFSP",
-               "run": "./tools/run-with-console.ps1 bash ./tools/test-interrupt.sh"
             },
             # {
             #    "name": "version check",
