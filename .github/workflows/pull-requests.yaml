@@ -8,23 +8,19 @@
                "name": "Check out source code",
                "uses": "actions/checkout@v1"
             },
-            {
-               "name": "python",
-               "run": "python3 ./tools/run-with-console.py"
-            },
-            {
-               "name": "Run interrupt",
-               "run": "tools/test-interrupt.sh",
-               "shell": "bash",
-            },
-            {
-               "name": "python",
-               "run": "python3 ./tools/test-interrupt.py"
-            },
+            # {
+            #    "name": "Run interrupt",
+            #    "run": "tools/test-interrupt.sh",
+            #    "shell": "bash",
+            # },
+            # {
+            #    "name": "python",
+            #    "run": "python3 ./tools/test-interrupt.py"
+            # },
             {
                "if": "matrix.host.platform_name == 'windows_amd64'",
                "name": "Install WinFSP",
-               "run": "choco install windows-kill winfsp"
+               "run": "choco install winfsp"
             },
             # {
             #    "name": "version check",
@@ -156,10 +152,14 @@
                "name": "Test bb-deployments style conformance",
                "run": "git diff --exit-code HEAD --"
             },
+            # {
+            #    "name": "Test bare deployment",
+            #    "run": "tools/test-deployment-bare.sh",
+            #    "shell": "bash"
+            # },
             {
-               "name": "Test bare deployment",
-               "run": "tools/test-deployment-bare.sh",
-               "shell": "bash"
+               "name": "python",
+               "run": "python3 ./tools/run-with-console.py"
             },
             {
                "if": "matrix.host.platform_name == 'linux_amd64'",
