@@ -34,25 +34,25 @@ kernel = ctypes.windll.kernel32
 try:
     pid = int(sys.argv[1])
     
-    # # FreeConsole
-    # result = kernel.FreeConsole()
-    # if not result:
-    #     error_msg = f"FreeConsole failed: {get_last_error()}"
-    #     log(error_msg)
-    #     # print(error_msg)
+    # FreeConsole
+    result = kernel.FreeConsole()
+    if not result:
+        error_msg = f"FreeConsole failed: {get_last_error()}"
+        log(error_msg)
+        # print(error_msg)
     
-    # # AttachConsole
-    # result = kernel.AttachConsole(pid)
-    # if not result:
-    #     error_msg = f"AttachConsole failed for PID {pid}: {get_last_error()}"
-    #     log(error_msg)
-    #     sys.exit(1)
+    # AttachConsole
+    result = kernel.AttachConsole(pid)
+    if not result:
+        error_msg = f"AttachConsole failed for PID {pid}: {get_last_error()}"
+        log(error_msg)
+        sys.exit(1)
     
-    # # SetConsoleCtrlHandler
-    # result = kernel.SetConsoleCtrlHandler(None, 1)
-    # if not result:
-    #     error_msg = f"SetConsoleCtrlHandler failed: {get_last_error()}"
-    #     log(error_msg)
+    # SetConsoleCtrlHandler
+    result = kernel.SetConsoleCtrlHandler(None, 1)
+    if not result:
+        error_msg = f"SetConsoleCtrlHandler failed: {get_last_error()}"
+        log(error_msg)
     
     # GenerateConsoleCtrlEvent
     result = kernel.GenerateConsoleCtrlEvent(0, 0)
