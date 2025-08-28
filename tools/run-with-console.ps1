@@ -4,7 +4,12 @@ This script runs the specified command via connhost to ensure that it has a
 proper Windows Console available. The reason for this script's existence is
 that Github Actions executes Windows scripts in an environment without an
 interactive console, and this breaks the sending of CTRL_C_EVENT which we
-use to gracefully terminate buildbarn.
+use to gracefully terminate buildbarn. Without this, the kill -SIGINT has
+no effect.
+
+One downside of this approach is that, in practice, the subprocesses's
+output is buffered until the subprocess terminates. Unfortunately there does
+not appear to be a workaround for this.
 #>
 param(
     [Parameter(Mandatory=$true)]
@@ -27,7 +32,6 @@ exit /b %ERRORLEVEL%
 try {
     $BatchContent | Out-File -FilePath $TempBatFile -Encoding ASCII
 
-    # Use conhost.exe to run the batch file with output capture
     $ProcessStartInfo = New-Object System.Diagnostics.ProcessStartInfo
     $ProcessStartInfo.FileName = "conhost.exe"
     $ProcessStartInfo.Arguments = "`"$TempBatFile`""

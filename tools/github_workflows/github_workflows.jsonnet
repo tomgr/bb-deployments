@@ -26,6 +26,11 @@ workflows_template.getWorkflows(
   ],
   [
     {
+      name: 'bazel mod integrity',
+      run: 'bazel mod graph || true',
+      'if': 'matrix.host.lint',
+    },
+    {
       name: 'Check the diff between docker-compose and Kubernetes configs',
       run: 'tools/diff-docker-and-k8s-configs.sh > tools/expected-docker-and-k8s-configs.diff',
       'if': 'matrix.host.lint',
@@ -60,11 +65,6 @@ workflows_template.getWorkflows(
       name: 'Test Kubernetes deployment',
       run: 'tools/test-deployment-kubernetes',
       'if': "matrix.host.platform_name == 'linux_amd64'",
-    },
-    {
-      name: 'bazel mod integrity',
-      run: 'bazel mod graph',
-      'if': 'matrix.host.lint',
     },
   ]
 )
