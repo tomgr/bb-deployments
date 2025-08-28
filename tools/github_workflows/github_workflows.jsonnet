@@ -41,9 +41,15 @@ workflows_template.getWorkflows(
       'if': 'matrix.host.lint',
     },
     {
-      name: 'Test bare deployment',
+      name: 'Test bare deployment (Unix)',
       run: 'tools/test-deployment-bare.sh',
       shell: 'bash',
+      'if': "matrix.host.platform_name != 'windows_amd64'",
+    },
+    {
+      name: 'Test bare deployment (Windows)',
+      run: "tools/run-with-console.ps1 -Command 'bash.exe -c ./tools/test-deployment-bare.sh'",
+      'if': "matrix.host.platform_name == 'windows_amd64'",
     },
     {
       name: 'Test docker-compose deployment',

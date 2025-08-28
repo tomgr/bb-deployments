@@ -139,9 +139,15 @@
                "run": "git diff --exit-code HEAD --"
             },
             {
-               "name": "Test bare deployment",
+               "if": "matrix.host.platform_name != 'windows_amd64'",
+               "name": "Test bare deployment (Unix)",
                "run": "tools/test-deployment-bare.sh",
                "shell": "bash"
+            },
+            {
+               "if": "matrix.host.platform_name == 'windows_amd64'",
+               "name": "Test bare deployment (Windows)",
+               "run": "tools/run-with-console.ps1 -Command 'bash.exe -c ./tools/test-deployment-bare.sh'"
             },
             {
                "if": "matrix.host.platform_name == 'linux_amd64'",
