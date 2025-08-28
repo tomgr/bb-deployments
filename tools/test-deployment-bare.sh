@@ -85,3 +85,5 @@ bazel --output_base="$abseil_output_base"  \
 grep -E '^INFO: [0-9]+ processes: .*[0-9]+ remote cache hit[.,]' \
     "$abseil_output_base/command.log" \
     | grep -v 'remote[,.]'
+
+exit 1
