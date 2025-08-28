@@ -56,8 +56,8 @@ cleanup() {
 trap cleanup EXIT
 
 # --- Run remote execution ---
-bazel --output_base="$abseil_output_base" --nohome_rc  clean
-bazel --output_base="$abseil_output_base" --nohome_rc \
+bazel --output_base="$abseil_output_base" clean
+bazel --output_base="$abseil_output_base" \
     test --color=no --curses=no $remote_exec_config --disk_cache= \
     @abseil-hello//:hello_test
 # Make sure there are remote executions but no cache hits.
@@ -68,21 +68,12 @@ grep -E '^INFO: [0-9]+ processes: .*[0-9]+ remote[.,]' \
 
 # --- Check that we get cache hit even after rebooting the server ---
 kill -s $kill_sig "$buildbarn_pid"
-sleep 30
-cat ${bare_output}
-# ps -a
-tasklist
-# if [[ "$OSTYPE" == "msys" || "$OSTYPE" == "win32" || "$OSTYPE" == "cygwin" ]]; then
-#     powershell -Command "Get-WmiObject -Class Win32_Processor | Measure-Object -Property LoadPercentage -Average | Select-Object -ExpandProperty Average"
-# else
-#     top -bn1 | grep "Cpu(s)" | awk '{print $2}' | sed 's/%us,//'
-# fi
 wait "$buildbarn_pid" || true
 $script_exec 2>"${bare_output}" &
 buildbarn_pid=$!
 
-bazel --output_base="$abseil_output_base" --nohome_rc  clean
-bazel --output_base="$abseil_output_base" --nohome_rc  \
+bazel --output_base="$abseil_output_base" clean
+bazel --output_base="$abseil_output_base"  \
     test --color=no --curses=no $remote_exec_config --disk_cache= \
     @abseil-hello//:hello_test
 # Make sure there are remote cache hits but no remote executions.

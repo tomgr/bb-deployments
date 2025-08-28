@@ -56,18 +56,10 @@ func bbStart(bbProcess *buildbarnProcess, workingDir string) *exec.Cmd {
 
 func gracefulShutdown(process *os.Process) {
 	if runtime.GOOS == "windows" {
-		// // On Windows, we need to send Ctrl+C to the process group
-		// // GenerateConsoleCtrlEvent sends the signal to all processes in the console session
-		// // that share the same process group ID as the calling process
-		// dll := syscall.NewLazyDLL("kernel32.dll")
-		// proc := dll.NewProc("GenerateConsoleCtrlEvent")
-
-		// // CTRL_C_EVENT = 0, process.Pid is the process group ID
-		// // Note: This will send Ctrl+C to all processes in the same console session
-		// ret, _, err := proc.Call(uintptr(0), uintptr(process.Pid))
-		// if ret == 0 {
-		// 	log.Printf("Failed to send Ctrl+C to process %d: %v", process.Pid, err)
-		// }
+		// On Windows, go does not support sending syscall.SIGINT. We instead
+		// rely on the fact that the CTRL_C_EVENT that is sent to signal
+		// graceful termination is normally delivered to the whole process
+		// group, so will already be sent to all of our subprocesses.
 	} else {
 		process.Signal(syscall.SIGTERM)
 	}
@@ -167,12 +159,11 @@ func main() {
 		<-interruptChan
 		log.Print("Received first SIGTERM, gracefully terminating Buildbarn processes")
 		cancelWithSigterm()
-		// TODO: not sure why this is bad?
 		// Kill on a second interrupt signal.
-		// <-interruptChan
-		// signal.Stop(interruptChan)
-		// log.Print("Received second SIGTERM, killing Buildbarn processes")
-		// cancelWithKill()
+		<-interruptChan
+		signal.Stop(interruptChan)
+		log.Print("Received second SIGTERM, killing Buildbarn processes")
+		cancelWithKill()
 	}()
 
 	// Kill processes if SIGTERM handling times out.
