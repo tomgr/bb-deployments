@@ -23,7 +23,7 @@ require (
 	github.com/bazelbuild/rules_go v0.56.1
 	github.com/buildbarn/bb-browser v0.0.0-20250820143915-823deb2f4b07
 	github.com/buildbarn/bb-remote-execution v0.0.0-20250820081613-efef252cdf4f
-	github.com/buildbarn/bb-storage v0.0.0-20250821140521-b7799c3c72ae
+	github.com/buildbarn/bb-storage v0.0.0-20250827121715-fbb7c11d3502
 	golang.org/x/lint v0.0.0-20241112194109-818c5a804067
 	mvdan.cc/gofumpt v0.8.0
 )
