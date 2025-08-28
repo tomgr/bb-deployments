@@ -10,28 +10,28 @@
             },
             {
                "name": "check interrupt",
-               "run": "tools/run-test-interrupt-with-console-v3.ps1 -Command 'bash.exe -c ./tools/test-interrupt.sh'"
+               "run": "tools/run-with-console.ps1 -Command 'bash.exe -c ./tools/test-interrupt.sh'"
             },
             {
                "if": "matrix.host.platform_name == 'windows_amd64'",
                "name": "Install WinFSP",
                "run": "choco install winfsp"
             },
-            # {
-            #    "name": "version check",
-            #    "run": "tools/test-interrupt.sh",
-            #    "shell": "bash",
-            # },
-            # {
-            #    "if": "matrix.host.platform_name == 'linux_amd64'",
-            #    "name": "Installing grpcurl",
-            #    "run": "mkdir -p ~/.cache/grpcurl &&\ncurl -L https://github.com/fullstorydev/grpcurl/releases/download/v1.8.9/grpcurl_1.8.9_linux_x86_64.tar.gz | tar -xz -C ~/.cache/grpcurl &&\necho \"~/.cache/grpcurl\" >> ${GITHUB_PATH}\n"
-            # },
-            # {
-            #    "if": "matrix.host.platform_name == 'linux_amd64'",
-            #    "name": "Install k3d",
-            #    "run": "curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash"
-            # },
+            {
+               "name": "version check",
+               "run": "tools/test-interrupt.sh",
+               "shell": "bash",
+            },
+            {
+               "if": "matrix.host.platform_name == 'linux_amd64'",
+               "name": "Installing grpcurl",
+               "run": "mkdir -p ~/.cache/grpcurl &&\ncurl -L https://github.com/fullstorydev/grpcurl/releases/download/v1.8.9/grpcurl_1.8.9_linux_x86_64.tar.gz | tar -xz -C ~/.cache/grpcurl &&\necho \"~/.cache/grpcurl\" >> ${GITHUB_PATH}\n"
+            },
+            {
+               "if": "matrix.host.platform_name == 'linux_amd64'",
+               "name": "Install k3d",
+               "run": "curl -s https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | bash"
+            },
             {
                "name": "Installing Bazel",
                "run": "v=$(cat .bazelversion) && curl -L https://github.com/bazelbuild/bazel/releases/download/${v}/bazel-${v}-${{matrix.host.bazel_os}}-x86_64 > ~/bazel && chmod +x ~/bazel && echo ~ >> ${GITHUB_PATH}",
@@ -149,29 +149,23 @@
             },
             {
                "name": "Test bare deployment",
-               # "run": "tools/test-deployment-bare.sh",
-               "run": "tools/run-test-interrupt-with-console-v3.ps1 -Command 'bash.exe -c ./tools/test-deployment-bare.sh'"
-               # "shell": "bash"
+               "run": "tools/run-with-console.ps1 -Command 'bash.exe -c ./tools/test-deployment-bare.sh'"
             },
-            # {
-            #    "name": "python",
-            #    "run": "python3 ./tools/run-with-console.py"
-            # },
-            # {
-            #    "if": "matrix.host.platform_name == 'linux_amd64'",
-            #    "name": "Test docker-compose deployment",
-            #    "run": "tools/test-deployment-docker-compose.sh"
-            # },
-            # {
-            #    "if": "matrix.host.platform_name == 'linux_amd64'",
-            #    "name": "Test Kubernetes deployment",
-            #    "run": "tools/test-deployment-kubernetes"
-            # },
-            # {
-            #    "if": "matrix.host.lint",
-            #    "name": "bazel mod integrity",
-            #    "run": "bazel mod graph"
-            # }
+            {
+               "if": "matrix.host.platform_name == 'linux_amd64'",
+               "name": "Test docker-compose deployment",
+               "run": "tools/test-deployment-docker-compose.sh"
+            },
+            {
+               "if": "matrix.host.platform_name == 'linux_amd64'",
+               "name": "Test Kubernetes deployment",
+               "run": "tools/test-deployment-kubernetes"
+            },
+            {
+               "if": "matrix.host.lint",
+               "name": "bazel mod integrity",
+               "run": "bazel mod graph"
+            }
          ],
          "strategy": {
             "matrix": {
