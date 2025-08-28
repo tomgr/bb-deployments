@@ -19,8 +19,8 @@ else:
     print(f"restore failed")
 
 process = subprocess.Popen(
-    ["C:\\Program Files\\Git\\bin\\bash.EXE", "tools/test-interrupt.sh"],
-    # ["powershell.exe", "tools/indirect-run.ps1"],
+    # ["C:\\Program Files\\Git\\bin\\bash.EXE", "tools/test-interrupt.sh"],
+    ["powershell.exe", "tools/indirect-run.ps1"],
     creationflags=subprocess.CREATE_NEW_CONSOLE|subprocess.CREATE_NEW_PROCESS_GROUP|subprocess.CREATE_NO_WINDOW,
     stdout=subprocess.PIPE,
     stderr=subprocess.PIPE,

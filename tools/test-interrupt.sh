@@ -7,7 +7,7 @@ echo "Testing SIGINT with simple subcommand"
 test_script="test-long-running-task.bat"
 cat > "$test_script" << 'EOF'
 echo Starting long running task...
-ping -n 60 -w 1000 localhost
+ping -n 30 -w 1000 localhost
 echo Task completed normally
 EOF
 
@@ -27,7 +27,11 @@ fi
 
 echo "Sending SIGINT to cmd.exe process..."
 
-CMD_WINDOWS_PID=$(cat /proc/$CMD_PID/winpid)
+# CMD_WINDOWS_PID=$(cat /proc/$CMD_PID/winpid)
+PGID=$(cat /proc/$CMD_PID/pgid)
+echo "Going to kill pid $CMD_PID who is in group $PGID"
+# echo "Current process PID: $$"
+# echo "Current process PGID: $(cat /proc/$$/pgid)"
 # powershell.exe ./tools/test-interrupt-pid.py $CMD_WINDOWS_PID
 kill -SIGINT $CMD_PID
 
