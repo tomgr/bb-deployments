@@ -2,35 +2,44 @@ import subprocess
 import sys
 import select
 import threading
+import signal
+from typing import  TextIO
 
-def stream_output(stream, output_stream):
-    """Stream output from subprocess to the specified output stream."""
+def stream_output(stream: TextIO, output_stream: TextIO):
     for line in iter(stream.readline, ''):
         output_stream.write(line)
         output_stream.flush()
     stream.close()
 
-# Use Popen instead of run to enable streaming
 process = subprocess.Popen(
-    [sys.executable, "tools/test-deployment-bare.py"],
+    ["C:\\Program Files\\Git\\bin\\bash.EXE", "tools/test-interrupt.sh"],
     creationflags=subprocess.CREATE_NEW_CONSOLE|subprocess.CREATE_NEW_PROCESS_GROUP|subprocess.CREATE_NO_WINDOW,
     stdout=subprocess.PIPE,
-    stderr=subprocess.STDOUT,
+    stderr=subprocess.PIPE,
     startupinfo=subprocess.STARTUPINFO(dwFlags=subprocess.STARTF_USESHOWWINDOW, wShowWindow=subprocess.SW_HIDE),
     text=True,
     bufsize=1,
 )
 
-# Create threads to stream stdout and stderr separately
 stdout_thread = threading.Thread(target=stream_output, args=(process.stdout, sys.stdout))
+stderr_thread = threading.Thread(target=stream_output, args=(process.stderr, sys.stderr))
 
-# Start the streaming threads
 stdout_thread.start()
+stderr_thread.start()
 
-# Wait for the process to complete
-returncode = process.wait()
+# Poll the process instead of blocking wait
+try:
+    print("Polling")
+    returncode = process.wait()
+except KeyboardInterrupt:
+    print("Terminating")
+    process.terminate()
+    returncode = 1
+    # break
+    # except subprocess.TimeoutExpired:
+    #     continue
 
-# Wait for all output to be streamed
 stdout_thread.join()
+stderr_thread.join()
 
 sys.exit(returncode)
